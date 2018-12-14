@@ -219,13 +219,12 @@ public class VHSDatabaseGUI extends JFrame {
     
     
     private void configureTable() {
-        //Configure VHS table (GUI)
-    
-        //Set up JTable
+
         VHSDataTable.setGridColor(Color.BLACK);
-        
-        //Enable sorting
+        //Set up JTable
+
         VHSDataTable.setAutoCreateRowSorter(true);
+        //Enable sorting
     
         columnNames = db.getColumnNames();
         Vector data = db.getAllVHS();
@@ -236,26 +235,89 @@ public class VHSDatabaseGUI extends JFrame {
         tableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int col) {
-                return (col == 6);  // Rating column only.
+                return (col <= 6 && col >= 1);  //Return valid columns
             }
         
             @Override
-            public void setValueAt(Object val, int row, int col) {
-            
+            public void setValueAt(Object val, int row, int col) throws NullPointerException {
+
                 // Get row and send new value to DB for update
                 int id = (int) getValueAt(row, 0);
-            
+
                 try {
-                    int newRating = Integer.parseInt(val.toString());
-                    if (newRating < VHSDatabase.VHS_MIN_RATING || newRating > VHSDatabase.VHS_MAX_RATING) {
-                        throw new NumberFormatException();
+                    if (col == 1)
+                    {
+                        int newUPC = Integer.parseInt(val.toString());
+                        if (newUPC > VHSDatabase.MAX_UPC_LENGTH | newUPC < VHSDatabase.MAX_UPC_LENGTH) {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NUMB
+                                            +VHSDatabase.YIELD_UPC);
+                            throw new NumberFormatException();
+                        }
+                        db.changeUPC(id, newUPC);
                     }
-                    db.changeRating(id, newRating);
+
+                    if (col == 2)
+                    {
+                        String newTitle = (val.toString());
+                        if (newTitle == null| newTitle == "") {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NULL);
+                            throw new NullPointerException();
+                        }
+                        db.changeTitle(id, newTitle);
+                    }
+
+                    if (col == 3)
+                    {
+                        String newDirector = (val.toString());
+                        if (newDirector == null|newDirector == "") {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NULL);
+                            throw new NullPointerException();
+                        }
+                        db.changeDirector(id, newDirector);
+                    }
+
+                    if (col == 4)
+                    {
+                        String newGenre = (val.toString());
+                        if (newGenre == null|newGenre == null) {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NULL);
+                            throw new NullPointerException();
+                        }
+                        db.changeGenre(id, newGenre);
+                    }
+
+                    if (col == 5)
+                    {
+                        int newYear = Integer.parseInt(val.toString());
+                        if (newYear < VHSDatabase.VHS_MIN_YEAR || newYear > VHSDatabase.VHS_MAX_YEAR) {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NUMB
+                                            +VHSDatabase.YIELD_RATING);
+                            throw new NumberFormatException();
+                        }
+                        db.changeYear(id, newYear);
+                    }
+
+                    if (col == 6)
+                    {
+                        int newRating = Integer.parseInt(val.toString());
+                        if (newRating < VHSDatabase.VHS_MIN_RATING || newRating > VHSDatabase.VHS_MAX_RATING) {
+                            JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
+                                    VHSDatabase.ERROR_NUMB
+                                            +VHSDatabase.YIELD_RATING);
+                            throw new NumberFormatException();
+                        }
+                        db.changeRating(id, newRating);
+                    }
+
+
                     updateTable();
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
-                            VHSDatabase.ERROR_NUMB
-                                    +VHSDatabase.YIELD_RATING);
+
                 }
             }
         };
