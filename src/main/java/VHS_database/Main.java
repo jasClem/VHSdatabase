@@ -1,12 +1,14 @@
 //Main Program - Jason
-//Run me
 
 package VHS_database;
+
+
 
 public class Main {
 
     public static void main(String args[]) throws InterruptedException {
 
+        System.out.println("\n");
         LoadingAnimation.main();
         //Play creation animation
 
@@ -16,6 +18,7 @@ public class Main {
         System.out.print("\r"+VHSDatabase.APP_TITLE+" successfully created\n");
         //Display successful creation message
 
+        System.out.println("\n");
         LoadingAnimation.main();
         //Play loading animation
 

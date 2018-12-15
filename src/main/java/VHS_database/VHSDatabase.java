@@ -6,8 +6,9 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Vector;
 
-public class VHSDatabase {
 
+
+public class VHSDatabase {
 
 //region [// VHSDatabase variables //]
 
@@ -15,25 +16,13 @@ public class VHSDatabase {
     //String variable for VHS Database title
 
     private static final String ID_COLUMN = "id";
-    //String variable for id number
-    
     private static final String UPC_COLUMN = "upc";
-    //String variable for VHS UPC number
-    
     private static final String TITLE_COLUMN = "title";
-    //String variable for film title
-    
     private static final String DIRECTOR_COLUMN = "director";
-    //String variable for film director
-    
     private static final String GENRE_COLUMN = "genre";
-    //String variable for film genre
-    
     private static final String YEAR_COLUMN = "year_released";
-    //String variable for release year
-    
     private static final String RATING_COLUMN = "rating";
-    //String variable for film rating
+    //String variables for VHS ID, UPC, Title, Director, Genre, Year & Rating columns.
 
     final static int VHS_MIN_YEAR = 1900;
     final static int VHS_MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR);
@@ -43,16 +32,21 @@ public class VHSDatabase {
     final static int VHS_MAX_RATING = 5;
     //Integer variables for Min/Max film ratings
 
-    final static int MAX_UPC_LENGTH = 12;
-    //Integer variable for maximum UPC number length
+    final static int UPC_LENGTH = 12;
+    //Integer variable for correct UPC length
 
-    public static boolean loaded = false;
-    //Boolean variable for loading
+    final static String[] genreList = new String[] {
+            "Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family",
+            "Fantasy","History","Horror","Musical","Mystery","Romance","Sci-Fi","Sports","Superhero","Thriller",
+            "War","Western"
+    };
+    //String list variable for film genres
 
 //endregion
 
 
 //region [// SQL statement string variables //]
+
     private static final String DB_CONNECTION_URL = "jdbc:sqlite:databases/VHS.sqlite";
     //String variable for VHS database connection
 
@@ -92,20 +86,20 @@ public class VHSDatabase {
 
     public static String YIELD_YEAR = " between "+VHS_MIN_YEAR+" - "+VHS_MAX_YEAR;
     public static String YIELD_RATING = " between "+VHS_MIN_RATING+" - "+VHS_MAX_RATING;
-    public static String YIELD_UPC = " & must be "+MAX_UPC_LENGTH+" characters";
+    public static String YIELD_UPC = " & must be "+UPC_LENGTH+" characters";
     //String variables for number yield error messages
 
 //endregion
 
 
+
     VHSDatabase() {
+
         createTable();
         //Create VHS collection table
 
-        //System.out.println("\n\n"+VHSDatabase.APP_TITLE+" table created successfully");
-        loaded = true;
-        //Set loaded boolean to true
     }
+
 
 
     private void createTable() {
@@ -114,9 +108,7 @@ public class VHSDatabase {
             //Try connecting to VHS database
 
             statement.executeUpdate(CREATE_VHS_TABLE);
-            //Create VHS collection table
-
-
+            //Try to create VHS collection table
 
         } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCR);
@@ -126,10 +118,11 @@ public class VHSDatabase {
     }
 
 
+
     Vector getColumnNames() {
 
         Vector colNames = new Vector();
-        //Vector variable for VHS collection table column names
+        //Vector variable for VHS collection column names
 
         colNames.add("ID");
         colNames.add("UPC");
@@ -138,10 +131,12 @@ public class VHSDatabase {
         colNames.add("Genre");
         colNames.add("Year Released");
         colNames.add("Rating");
-        //Column names for VHS ID, UPC, Title, Director, Genre, Year Released & Ratings
+        //Add column names for VHS ID, UPC, Title, Director, Genre, Year Released & Ratings
 
         return colNames;
+        //Return column names
     }
+
 
 
     Vector<Vector> getAllVHS() {
@@ -151,10 +146,10 @@ public class VHSDatabase {
             //Connect to VHS database
 
             ResultSet rs = statement.executeQuery(GET_VHS);
-            //ResultSet variable for SQL statement to get VHS collection tapes
+            //ResultSet variable for SQL statement to get VHS tapes
 
-            Vector<Vector> vectors = new Vector<>();
-            //Vector variables
+            Vector<Vector> vhsList = new Vector<>();
+            //Vector list variable for required vectors
 
             String name, director, genre;
             //String variables for VHS name, director & genre
@@ -171,22 +166,30 @@ public class VHSDatabase {
                 genre = rs.getString(GENRE_COLUMN);
                 year = rs.getInt(YEAR_COLUMN);
                 rating = rs.getInt(RATING_COLUMN);
-                //Get each item
+                //Get each VHS
 
-                Vector v = new Vector();
-                v.add(id); v.add(upc); v.add(name); v.add(director); v.add(genre); v.add(year); v.add(rating);
-                vectors.add(v);
-                //Add each item to vectors
+                Vector vhs = new Vector();
+                //Vector variable for each VHS
+
+
+                vhs.add(id); vhs.add(upc); vhs.add(name); vhs.add(director); vhs.add(genre); vhs.add(year); vhs.add(rating);
+                //Add info to vector for each VHS
+
+                vhsList.add(vhs);
+                //Add each VHS vector to VHS vector list
             }
-            return vectors;
+
+            return vhsList;
+            //Return VHS vector list
 
         } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN);
             throw new RuntimeException(ERROR);
-            //Catch errors/display message
+            //Catch errors/display error message
         }
 
     }
+
 
 
     public void addVHS(int upc, String title, String director, String genre, int year, int rating) {
@@ -204,11 +207,12 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" when adding VHS");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
+
 
 
     public void deleteVHS(int id) {
@@ -220,11 +224,13 @@ public class VHSDatabase {
             preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while deleting VHS");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
+
+
 
     public void changeUPC(int id, int upc) {
         //Change VHS UPC number
@@ -241,8 +247,9 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS UPC number");
             throw new RuntimeException(e);
         }
-
     }
+
+
 
     public void changeTitle(int id, String title) {
         //Change VHS title
@@ -259,8 +266,9 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS title");
             throw new RuntimeException(e);
         }
-
     }
+
+
 
     public void changeDirector(int id, String director) {
         //Change VHS director
@@ -277,8 +285,9 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS director");
             throw new RuntimeException(e);
         }
-
     }
+
+
 
     public void changeGenre(int id, String genre) {
         //Change VHS genre
@@ -295,8 +304,9 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS genre");
             throw new RuntimeException(e);
         }
-
     }
+
+
 
     public void changeRating(int id, int rating) {
         //Change VHS rating
@@ -313,8 +323,9 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS rating");
             throw new RuntimeException(e);
         }
-
     }
+
+
 
     public void changeYear(int id, int year) {
         //Change VHS year
@@ -331,7 +342,5 @@ public class VHSDatabase {
             System.out.println(ERROR_DBCN+" while changing VHS year");
             throw new RuntimeException(e);
         }
-
     }
-
 }

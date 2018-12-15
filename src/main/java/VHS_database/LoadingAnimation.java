@@ -2,25 +2,44 @@
 
 package VHS_database;
 
+
+
 public class LoadingAnimation {
 
+//region [// Animation variables //]
+
     private String lastLine = "";
+    //String variable for blank string
+
+    private byte anim;
+    //Byte variable for changing animations
+
+    private static byte loadStage;
+    //Byte variable for changing loading stages
+
+//endregion
+
+
 
     public void print(String line) {
-        //clear the last line if longer
         if (lastLine.length() > line.length()) {
             String temp = "";
+
             for (int i = 0; i < lastLine.length(); i++) {
                 temp += " ";
             }
+
             if (temp.length() > 1)
                 System.out.print("\r" + temp);
+            //Clear the previous line
         }
+
         System.out.print("\r" + line);
         lastLine = line;
+        //Print next line
     }
 
-    private byte anim;
+
 
     public void animate(String line) {
         switch (anim) {
@@ -38,9 +57,10 @@ public class LoadingAnimation {
                 anim = 0;
         }
         anim++;
+        //Animation cycle
     }
 
-    private static byte loadStage;
+
 
     public static void main() throws InterruptedException {
 
@@ -63,6 +83,6 @@ public class LoadingAnimation {
                 loadStage = 0;
         }
         loadStage++;
-
+        //Loading cycle/run animations
     }
 }
