@@ -27,6 +27,5 @@ public class Main {
 
         System.out.print("\r"+VHSDatabase.APP_TITLE+" successfully loaded\n");
         //Display successful load message
-
     }
 }

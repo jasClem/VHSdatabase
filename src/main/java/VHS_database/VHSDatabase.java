@@ -2,6 +2,7 @@
 
 package VHS_database;
 
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.Calendar;
 import java.util.Vector;
@@ -78,7 +79,7 @@ public class VHSDatabase {
 //region [// Error message string variables //]
 
     public static String ERROR_NUMB = "//ERROR//: Field only accepts numeric data";
-    public static String ERROR_NULL = "//ERROR//: Field cannot be null/blank";
+    public static String ERROR_NULL = "//ERROR//: Field cannot be null";
     public static String ERROR_SLCT = "//ERROR//: Field requires selection";
     public static String ERROR_DBCR = "//ERROR//: Unable to create VHS database";
     public static String ERROR_DBCN = "//ERROR//: Unable to connect to VHS Database";
@@ -151,16 +152,16 @@ public class VHSDatabase {
             Vector<Vector> vhsList = new Vector<>();
             //Vector list variable for required vectors
 
-            String name, director, genre;
-            //String variables for VHS name, director & genre
+            String upc, name, director, genre;
+            //String variables for VHS UPC, name, director & genre
 
-            int id, upc, year, rating;
-            //Integer variables for VHS id, upc, year & rating
+            int id, year, rating;
+            //Integer variables for VHS id, year & rating
 
             while (rs.next()) {
 
                 id = rs.getInt(ID_COLUMN);
-                upc = rs.getInt(UPC_COLUMN);
+                upc = rs.getString(UPC_COLUMN);
                 name = rs.getString(TITLE_COLUMN);
                 director = rs.getString(DIRECTOR_COLUMN);
                 genre = rs.getString(GENRE_COLUMN);
@@ -192,13 +193,13 @@ public class VHSDatabase {
 
 
 
-    public void addVHS(int upc, String title, String director, String genre, int year, int rating) {
+    public void addVHS(String upc, String title, String director, String genre, int year, int rating) {
         //Add VHS
 
         try (Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
              PreparedStatement preparedStatement = connection.prepareStatement(ADD_VHS)) {
 
-            preparedStatement.setInt(1, upc);
+            preparedStatement.setString(1, upc);
             preparedStatement.setString(2, title);
             preparedStatement.setString(3, director);
             preparedStatement.setString(4, genre);
@@ -232,20 +233,20 @@ public class VHSDatabase {
 
 
 
-    public void changeUPC(int id, int upc) {
+    public void changeUPC(int id, String upc) {
         //Change VHS UPC number
 
         try (Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
              PreparedStatement preparedStatement = connection.prepareStatement(EDIT_VHS_UPC)) {
 
-            preparedStatement.setInt(1, upc);
+            preparedStatement.setString(1, upc);
             preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS UPC number");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 
@@ -262,9 +263,9 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS title");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 
@@ -281,9 +282,9 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS director");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 
@@ -300,9 +301,9 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS genre");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 
@@ -319,9 +320,9 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS rating");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 
@@ -338,9 +339,9 @@ public class VHSDatabase {
 
             preparedStatement.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException ERROR) {
             System.out.println(ERROR_DBCN+" while changing VHS year");
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR);
         }
     }
 }

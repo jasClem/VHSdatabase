@@ -7,6 +7,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Vector;
 
@@ -31,9 +33,6 @@ public class VHSDatabaseGUI extends JFrame {
     private JTextField directorTextField;
     //JTextField variable for film director text field
 
-    //private JSpinner genreTextField;
-    //JTextField variable for film genre text field
-
     private JTextField yearTextField;
     //JTextField variable for film year text field
 
@@ -47,6 +46,7 @@ public class VHSDatabaseGUI extends JFrame {
     //JSpinner variable for film rating selection
 
     private JSpinner genreSpinner;
+    //JSpinner variable for film genre selection
 
     private JButton quitButton;
     //JButton variable for quitting application
@@ -62,8 +62,6 @@ public class VHSDatabaseGUI extends JFrame {
 
     private SpinnerListModel genreModel = new SpinnerListModel(VHSDatabase.genreList);
     //SpinnerListModel variable for film genres
-
-    public static boolean loaded = false;
 
 //endregion
 
@@ -93,53 +91,110 @@ public class VHSDatabaseGUI extends JFrame {
         genreSpinner.setModel(genreModel);
         //Set up the genre spinner
         
-        //Event handlers for add, delete and quit buttons
+
         addNewVHSButton.addActionListener(new ActionListener() {
+            //Add New VHS button
             @Override
             public void actionPerformed(ActionEvent e) {
                 addVHS();
+                //Event handler for adding new VHS button
             }
         });
         
         deleteVHSButton.addActionListener(new ActionListener() {
+            //Delete VHS button
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteSelectedVHS();
+                //Event handler for deleting selected VHS button
             }
         });
     
         quitButton.addActionListener(new ActionListener() {
+            //Quit button
             @Override
             public void actionPerformed(ActionEvent e) {
                 VHSDatabaseGUI.this.dispose();
-                //Close JFrame/end application
+                //Event handler for closing JFrame/ending application
             }
         });
 
+        VHSDataTable.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+
+                int currentRow = VHSDataTable.getSelectedRow();
+                //Integer variable from current row selection
+
+                if (currentRow == -1)
+                {
+                    upcTextField.setText("");
+                    titleTextField.setText("");
+                    directorTextField.setText("");
+                    genreSpinner.setValue("Action");
+                    yearTextField.setText(String.valueOf(""));
+                    ratingSpinner.setValue(1);
+                    //Clear text/spinner fields
+
+                } else {
+
+                    String selectedUPC = (String) VHSDataTable.getValueAt(currentRow, 1);
+                    String selectedTitle = (String) VHSDataTable.getValueAt(currentRow, 2);
+                    String selectedDirector = (String) VHSDataTable.getValueAt(currentRow, 3);
+                    String selectedGenre = (String) VHSDataTable.getValueAt(currentRow, 4);
+                    int selectedYear = (int) VHSDataTable.getValueAt(currentRow, 5);
+                    int selectedRating = (int) VHSDataTable.getValueAt(currentRow, 6);
+                    //Get selected VHS info
+
+                    upcTextField.setText(selectedUPC);
+                    titleTextField.setText(selectedTitle);
+                    directorTextField.setText(selectedDirector);
+                    genreSpinner.setValue(String.valueOf(selectedGenre));
+                    yearTextField.setText(String.valueOf(selectedYear));
+                    ratingSpinner.setValue(selectedRating);
+                    //Insert selected info into Text & Spinner fields
+                }
+            }
+        });
+
+        Action action = new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                TableCellListener tcl = (TableCellListener)e.getSource();
+
+                /* For debugging table cell selection
+                System.out.println("\n");
+                System.out.println("Row   : " + tcl.getRow());
+                System.out.println("Column: " + tcl.getColumn());
+                System.out.println("Old   : " + tcl.getOldValue());
+                System.out.println("New   : " + tcl.getNewValue());
+                */
+
+                if (tcl.getColumn() == 4){
+
+
+
+                }
+            }
+        };
+
+        TableCellListener tcl = new TableCellListener(VHSDataTable, action);
+
         pack();
         setVisible(true);
-        //Display GUI
-
-        //System.out.println("\n\n"+VHSDatabase.APP_TITLE+" loaded successfully");
-        loaded = true;
-        //Set loaded boolean to true
-    
+        //Pack & enable GUI visibility
     }
-    
-
 
     private void addVHS() {
 
-        int upcData;
-        //Integer variable for VHS UPC
+        String upcData;
+        //String variable for VHS UPC
 
         try {
-            upcData = Integer.parseInt(upcTextField.getText());
+            upcData = upcTextField.getText();
 
-            String upcLength = upcTextField.getText();
-            //String variable for UPC length
-
-            if (upcLength.length() != VHSDatabase.UPC_LENGTH) {
+            if (upcData.length() != VHSDatabase.UPC_LENGTH) {
                 //Check UPC length (12 numbers)
 
                 throw new NumberFormatException(
@@ -213,6 +268,10 @@ public class VHSDatabaseGUI extends JFrame {
         
         db.addVHS(upcData, titleData, directorData, genreData, yearData, ratingData);
         //Add data to database
+
+
+        JOptionPane.showMessageDialog(rootPane,
+                titleData+" has been added to the database");
         
         updateTable();
         //Update VHS table
@@ -237,8 +296,14 @@ public class VHSDatabaseGUI extends JFrame {
                     currentRow, 0);
             //Get ID integer for selected VHS
 
+            String vhsTitle = (String) VHSDataTable.getValueAt(
+                    currentRow, 2);
+
             db.deleteVHS(currentID);
             //Delete selected VHS
+
+            JOptionPane.showMessageDialog(rootPane,
+                    vhsTitle+" has been deleted from the database");
 
             updateTable();
             //Update VHS table
@@ -261,7 +326,6 @@ public class VHSDatabaseGUI extends JFrame {
 
         Vector data = db.getAllVHS();
         //Get vector data from all VHS
-    
 
         tableModel = new DefaultTableModel(data, columnNames) {
             @Override
@@ -269,7 +333,6 @@ public class VHSDatabaseGUI extends JFrame {
                 return (col <= 6 && col >= 1);
                 //Return valid columns only
             }
-
             @Override
             public void setValueAt(Object val, int row, int col) throws NullPointerException,
                     NumberFormatException {
@@ -277,12 +340,20 @@ public class VHSDatabaseGUI extends JFrame {
                 int id = (int) getValueAt(row, 0);
                 //Get VHS ID from selected VHS row
 
+                String selectedUPC = (String) VHSDataTable.getValueAt(row, 1);
+                String selectedTitle = (String) VHSDataTable.getValueAt(row, 2);
+                String selectedDirector = (String) VHSDataTable.getValueAt(row, 3);
+                String selectedGenre = (String) VHSDataTable.getValueAt(row, 4);
+                int selectedYear = (int) VHSDataTable.getValueAt(row, 5);
+                int selectedRating = (int) VHSDataTable.getValueAt(row, 6);
+                //Get selected VHS info
+
                 if (col == 1)
                 {
-                    int newUPC = Integer.parseInt(val.toString());
+                    String newUPC = val.toString();
                     //Get UPC number
 
-                    if (newUPC != VHSDatabase.UPC_LENGTH) {
+                    if (newUPC.length() != VHSDatabase.UPC_LENGTH) {
                         JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
                                 VHSDatabase.ERROR_NUMB
                                         +VHSDatabase.YIELD_UPC);
@@ -291,14 +362,20 @@ public class VHSDatabaseGUI extends JFrame {
                     }
                     db.changeUPC(id, newUPC);
                     //Change UPC number to new value
+
+                    if (!newUPC.equals(selectedUPC)){
+                        JOptionPane.showMessageDialog(rootPane,
+                                selectedTitle+"'s UPC has been changed from ["
+                                        +selectedUPC+"] to ["+newUPC+"]");
+                    }
                 }
 
                 if (col == 2)
                 {
-                    String newTitle = (val.toString());
+                    String newTitle = val.toString();
                     //Get VHS title
 
-                    if (newTitle == null| newTitle == "") {
+                    if (newTitle == null) {
                         JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
                                 VHSDatabase.ERROR_NULL);
                         throw new NullPointerException();
@@ -307,14 +384,20 @@ public class VHSDatabaseGUI extends JFrame {
 
                     db.changeTitle(id, newTitle);
                     //Change title to new value
+
+                    if (!newTitle.equals(selectedTitle)){
+                        JOptionPane.showMessageDialog(rootPane,
+                                newTitle+"'s title has been changed from ["
+                                        +selectedTitle+"] to ["+newTitle+"]");
+                    }
                 }
 
                 if (col == 3)
                 {
-                    String newDirector = (val.toString());
+                    String newDirector = val.toString();
                     //Get VHS director
 
-                    if (newDirector == null|newDirector == "") {
+                    if (newDirector == null) {
                         JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
                                 VHSDatabase.ERROR_NULL);
                         throw new NullPointerException();
@@ -323,14 +406,21 @@ public class VHSDatabaseGUI extends JFrame {
 
                     db.changeDirector(id, newDirector);
                     //Change director to new value
+
+                    if (!newDirector.equals(selectedDirector)){
+                        JOptionPane.showMessageDialog(rootPane,
+                                selectedTitle+"'s director has been changed from ["
+                                        +selectedDirector+"] to ["+newDirector+"]");
+                    }
+
                 }
 
                 if (col == 4)
                 {
-                    String newGenre = (val.toString());
+                    String newGenre = (String) genreSpinner.getValue();
                     //Get VHS genre
 
-                    if (newGenre == null|newGenre == null) {
+                    if (newGenre == null) {
                         JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
                                 VHSDatabase.ERROR_NULL);
                         throw new NullPointerException();
@@ -339,6 +429,14 @@ public class VHSDatabaseGUI extends JFrame {
 
                     db.changeGenre(id, newGenre);
                     //Change genre to new value
+
+                    if (!newGenre.equals(selectedGenre)){
+                        JOptionPane.showMessageDialog(rootPane,
+                                selectedTitle+"'s genre has been changed from ["
+                                        +selectedGenre+"] to ["+newGenre+"]");
+                    }
+
+
                 }
 
                 if (col == 5)
@@ -349,18 +447,24 @@ public class VHSDatabaseGUI extends JFrame {
                     if (newYear < VHSDatabase.VHS_MIN_YEAR || newYear > VHSDatabase.VHS_MAX_YEAR) {
                         JOptionPane.showMessageDialog(VHSDatabaseGUI.this,
                                 VHSDatabase.ERROR_NUMB
-                                        +VHSDatabase.YIELD_RATING);
+                                        +VHSDatabase.YIELD_YEAR);
                         throw new NumberFormatException();
                         //Catch errors/display error message
                     }
 
                     db.changeYear(id, newYear);
                     //Change year to new value
+
+                    if (newYear != selectedYear) {
+                        JOptionPane.showMessageDialog(rootPane,
+                                selectedTitle+"'s year has been changed from ["
+                                        +selectedYear+"] to ["+newYear+"]");
+                    }
                 }
 
                 if (col == 6)
                 {
-                    int newRating = Integer.parseInt(val.toString());
+                    int newRating = (int) ratingSpinner.getValue();
                     //Get VHS rating
 
                     if (newRating < VHSDatabase.VHS_MIN_RATING || newRating > VHSDatabase.VHS_MAX_RATING) {
@@ -373,10 +477,24 @@ public class VHSDatabaseGUI extends JFrame {
 
                     db.changeRating(id, newRating);
                     //Change rating to new value
+
+                    if (newRating != selectedRating) {
+                        JOptionPane.showMessageDialog(rootPane,
+                                selectedTitle+"'s rating has been changed from ["
+                                        +selectedRating+"] to ["+newRating+"]");
+                    }
                 }
 
                 updateTable();
                 //Update table data
+
+                upcTextField.setText("");
+                titleTextField.setText("");
+                directorTextField.setText("");
+                genreSpinner.setValue("Action");
+                yearTextField.setText(String.valueOf(""));
+                ratingSpinner.setValue(1);
+                //Clear text/spinner fields
             }
         };
 
