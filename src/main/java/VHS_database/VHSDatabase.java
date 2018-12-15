@@ -2,7 +2,7 @@
 
 package VHS_database;
 
-import java.math.BigInteger;
+
 import java.sql.*;
 import java.util.Calendar;
 import java.util.Vector;
@@ -167,7 +167,7 @@ public class VHSDatabase {
                 genre = rs.getString(GENRE_COLUMN);
                 year = rs.getInt(YEAR_COLUMN);
                 rating = rs.getInt(RATING_COLUMN);
-                //Get each VHS
+                //Get each VHS for rule set
 
                 Vector vhs = new Vector();
                 //Vector variable for each VHS
