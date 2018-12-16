@@ -19,6 +19,23 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+
+        <!--Input Utils is for simplifying user input-->
+        <dependency>
+            <groupId>edu.minneapolis</groupId>
+            <artifactId>input-utils</artifactId>
+            <version>[1.0.0,)</version>
+        </dependency>
+
+        <!-- SQLite database driver -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.21.0</version>
+        </dependency>
+
+    </dependencies>
 
 
 </project>
