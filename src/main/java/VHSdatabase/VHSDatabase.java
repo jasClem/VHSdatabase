@@ -1,6 +1,6 @@
 //VHS Database System - Jason
 
-package VHS_database;
+package VHSdatabase;
 
 
 import java.sql.*;

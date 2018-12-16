@@ -1,4 +1,4 @@
-package VHS_database;
+package VHSdatabase;
 
 import java.awt.event.*;
 import javax.swing.*;

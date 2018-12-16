@@ -1,6 +1,6 @@
 //Loading Animation - Jason
 
-package VHS_database;
+package VHSdatabase;
 
 
 

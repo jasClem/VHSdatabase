@@ -1,6 +1,6 @@
 //VHS Database GUI - Jason
 
-package VHS_database;
+package VHSdatabase;
 
 
 import javax.swing.*;
