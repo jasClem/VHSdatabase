@@ -1,6 +1,9 @@
-//Main Program - Jason
-//Run Me
-
+/**
+ * // VHS Database // - Jason Clemons
+ *
+ * Main class - Runs/Launches app
+ *
+ */
 package VHSdatabase;
 
 

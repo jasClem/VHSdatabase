@@ -1,5 +1,9 @@
-//VHS Database System - Jason
-
+/**
+ * // VHS Database // - Jason Clemons
+ *
+ * VHSDatabase class - handles database processing/SQL statements
+ *
+ */
 package VHSdatabase;
 
 

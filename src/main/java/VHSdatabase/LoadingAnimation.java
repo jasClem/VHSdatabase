@@ -1,5 +1,9 @@
-//Loading Animation - Jason
-
+/**
+ * // VHS Database // - Jason Clemons
+ *
+ * Loading Animation - Plays loading animations
+ *
+ */
 package VHSdatabase;
 
 
@@ -11,7 +15,7 @@ public class LoadingAnimation {
     private String lastLine = "";
     //String variable for blank string
 
-    private byte anim;
+    private byte animationFrame;
     //Byte variable for changing animations
 
     private static byte loadStage;
@@ -21,7 +25,38 @@ public class LoadingAnimation {
 
 
 
-    public void print(String line) {
+    public static void main() throws InterruptedException {
+
+        LoadingAnimation load = new LoadingAnimation();
+        //LoadingAnimation variable for loading
+
+        switch (loadStage) {
+            case 1:
+                for (int i = 0; i < 17; i++) {
+                    load.animator("Loading " +VHSDatabase.APP_TITLE);
+                    Thread.sleep(400);
+                    //Loading stage
+
+                }
+                break;
+            default:
+                for (int i = 0; i < 17; i++) {
+                    load.animator("Creating " +VHSDatabase.APP_TITLE);
+                    Thread.sleep(400);
+                    //Creating stage
+
+                }
+                loadStage = 0;
+        }
+        loadStage++;
+        //Loading cycle/run animations
+    }
+
+
+
+    public void printer(String line) {
+        //Line printer (Prints animation frames)
+
         if (lastLine.length() > line.length()) {
             String temp = "";
 
@@ -31,7 +66,7 @@ public class LoadingAnimation {
 
             if (temp.length() > 1)
                 System.out.print("\r" + temp);
-            //Clear the previous line
+            //Clear the previous lines
         }
 
         System.out.print("\r" + line);
@@ -41,48 +76,32 @@ public class LoadingAnimation {
 
 
 
-    public void animate(String line) {
-        switch (anim) {
+    public void animator(String line) {
+        switch (animationFrame) {
+            //Animation frames (get sent to printer)
+
             case 1:
-                print(line+" [ \\ ] ");
+                printer(line+" [ \\ ] ");
                 break;
+                //Frame #2
+
             case 2:
-                print(line+" [ | ] ");
+                printer(line+" [ | ] ");
                 break;
+                //Frame #3
+
             case 3:
-                print(line+" [ / ] ");
+                printer(line+" [ / ] ");
                 break;
+                //Frame #4
+
             default:
-                print(line+" [ - ] ");
-                anim = 0;
+                printer(line+" [ - ] ");
+                animationFrame = 0;
+                //Frame #1/reset
+
         }
-        anim++;
+        animationFrame++;
         //Animation cycle
-    }
-
-
-
-    public static void main() throws InterruptedException {
-
-        LoadingAnimation load = new LoadingAnimation();
-
-        switch (loadStage) {
-            case 1:
-                for (int i = 0; i < 17; i++) {
-                    load.animate("Loading " +VHSDatabase.APP_TITLE);
-                    Thread.sleep(400);
-
-                }
-                break;
-            default:
-                for (int i = 0; i < 17; i++) {
-                    load.animate("Creating " +VHSDatabase.APP_TITLE);
-                    Thread.sleep(400);
-
-                }
-                loadStage = 0;
-        }
-        loadStage++;
-        //Loading cycle/run animations
     }
 }

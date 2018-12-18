@@ -1,5 +1,9 @@
-//VHS Database GUI - Jason
-
+/**
+ * // VHS Database // - Jason Clemons
+ *
+ * VHSDatabaseGUI - handles interaction with database GUI form
+ *
+ */
 package VHSdatabase;
 
 
@@ -26,43 +30,31 @@ public class VHSDatabaseGUI extends JFrame {
     //JPanel variable for rootPanel
 
     private JTextField upcTextField;
-    //JTextField variable for VHS UPC text field
-
     private JTextField titleTextField;
-    //JTextField variable for VHS title text field
-
     private JTextField directorTextField;
-    //JTextField variable for film director text field
-
     private JTextField yearTextField;
-    //JTextField variable for film year text field
-
-    private JButton addNewVHSButton;
-    //JButton variable for adding new VHS
-
-    private JButton deleteVHSButton;
-    //JButton variable for deleting VHS
+    //JTextField variables for VHS UPC, title, director & year text fields
 
     private JSpinner ratingSpinner;
-    //JSpinner variable for film rating selection
-
     private JSpinner genreSpinner;
-    //JSpinner variable for film genre selection
+    //JSpinner variables for VHS rating & genre selection
 
+    private SpinnerListModel genreModel = new SpinnerListModel(VHSDatabase.genreList);
+    //SpinnerListModel variable (selected list of film genres)
+
+    private JButton addNewVHSButton;
+    private JButton deleteVHSButton;
     private JButton quitButton;
-    //JButton variable for quitting application
+    //JButton variables for adding/deleting VHS & quitting application
 
     private VHSDatabase db;
-    //VHSDatabase variable for selecting database
+    //VHSDatabase variable for VHS database
     
     private DefaultTableModel tableModel;
-    //DefaultTableModel variable for selecting table model
+    //DefaultTableModel variable for table model
 
     private Vector columnNames;
     //Vector variable for column names
-
-    private SpinnerListModel genreModel = new SpinnerListModel(VHSDatabase.genreList);
-    //SpinnerListModel variable for film genres
 
 //endregion
 
@@ -87,10 +79,10 @@ public class VHSDatabaseGUI extends JFrame {
 
         ratingSpinner.setModel(new SpinnerNumberModel(1,
                 VHSDatabase.VHS_MIN_RATING, VHSDatabase.VHS_MAX_RATING, 1));
-        //Set up the rating spinner. SpinnerNumberModel constructor arguments: spinner's initial value, min, max, step.
+        //Set the rating spinner model
 
         genreSpinner.setModel(genreModel);
-        //Set up the genre spinner
+        //Set the genre spinner model
 
         addNewVHSButton.addActionListener(new ActionListener() {
             //Add New VHS button
@@ -129,42 +121,9 @@ public class VHSDatabaseGUI extends JFrame {
             }
         });
 
-        Action action = new AbstractAction()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                TableCellListener tcl = (TableCellListener)e.getSource();
-                //Get info from TableCellListener
-
-                /*
-                For debug messages using table cell selection
-                System.out.println("\n");
-                System.out.println("   Row: " + tcl.getRow());
-                System.out.println("Column: " + tcl.getColumn());
-                System.out.println("   Old: " + tcl.getOldValue());
-                System.out.println("   New: " + tcl.getNewValue());
-                */
-
-                if (tcl.getColumn() == 4){
-
-                    //Not finished
-                    //For adding genre spinner to correct selected cell
-                }
-
-                if (tcl.getColumn() == 6){
-
-                    //Not finished
-                    //For adding rating spinner to correct selected cell
-                }
-            }
-        };
-
-        TableCellListener tcl = new TableCellListener(VHSDataTable, action);
-        //TableCellListener variable
-
         pack();
         setVisible(true);
-        //Pack & enable GUI visibility
+        //Pack & set GUI visibility
     }
 
 
@@ -212,10 +171,14 @@ public class VHSDatabaseGUI extends JFrame {
         //String variable for VHS UPC
 
         try {
-            upcData = upcTextField.getText();
+            int upcNumb = Integer.parseInt(upcTextField.getText());
+            //Get UPC as integer
+
+            upcData = String.format("%12d", upcNumb);
+            //Left pad with 0's up to 12 digits
 
             if (upcData.length() != VHSDatabase.UPC_LENGTH) {
-                //Check UPC length (12 numbers)
+                //Check UPC length (12 digits)
 
                 throw new NumberFormatException(
                         VHSDatabase.ERROR_NUMB
@@ -384,8 +347,9 @@ public class VHSDatabaseGUI extends JFrame {
                 int selectedRating = (int) VHSDataTable.getValueAt(row, 6);
                 //Get selected VHS info
 
-                if (col == 1)
-                {
+                if (col == 1){
+                    //Column 1 = UPC
+
                     String newUPC = val.toString();
                     //Get UPC number
 
@@ -407,8 +371,9 @@ public class VHSDatabaseGUI extends JFrame {
                     }
                 }
 
-                if (col == 2)
-                {
+                if (col == 2){
+                    //Column 2 = Title
+
                     String newTitle = val.toString();
                     //Get VHS title
 
@@ -430,8 +395,9 @@ public class VHSDatabaseGUI extends JFrame {
                     }
                 }
 
-                if (col == 3)
-                {
+                if (col == 3){
+                    //Column 3 = Director
+
                     String newDirector = val.toString();
                     //Get VHS director
 
@@ -451,12 +417,10 @@ public class VHSDatabaseGUI extends JFrame {
                                         +selectedDirector+"] to ["+newDirector+"]");
                         //If selection is changed, display message
                     }
-
                 }
 
-                if (col == 4)
-                {
-
+                if (col == 4){
+                    //Column 4 = Genre
 
                     String newGenre = (String) genreSpinner.getValue();
                     //Get VHS genre
@@ -477,12 +441,11 @@ public class VHSDatabaseGUI extends JFrame {
                                         +selectedGenre+"] to ["+newGenre+"]");
                         //If selection is changed, display message
                     }
-
-
                 }
 
-                if (col == 5)
-                {
+                if (col == 5){
+                    //Column 5 = Year
+
                     int newYear = Integer.parseInt(val.toString());
                     //Get VHS year
 
@@ -505,8 +468,9 @@ public class VHSDatabaseGUI extends JFrame {
                     }
                 }
 
-                if (col == 6)
-                {
+                if (col == 6){
+                    //Column 6 = Rating
+
                     int newRating = (int) ratingSpinner.getValue();
                     //Get VHS rating
 
